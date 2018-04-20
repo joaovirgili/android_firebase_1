@@ -141,18 +141,14 @@ public class AddInformationActivity extends AppCompatActivity {
             try {
                 profileImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uriImage);
                 imageUpload.setImageBitmap(profileImage);
-
-//                uploadImageToFirebase();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
     }
 
     private void showImageChooser() {
         Intent intent = new Intent().setType("image/*").setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, CHOOSE_IMAGE);
     }
-
 }

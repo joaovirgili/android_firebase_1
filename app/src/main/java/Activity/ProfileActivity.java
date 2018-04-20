@@ -3,32 +3,50 @@ package Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.joaovirgili.projetofirebase1.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.Iterator;
+
 import DAO.FirebaseConfiguration;
+import classes.User;
 
 public class ProfileActivity extends AppCompatActivity {
 
+    ConstraintLayout userProfileLayout;
+    ProgressBar userProfileProgress;
+
     TextView textName;
     TextView textEmail;
+    TextView textLastName;
     Button btnLogout;
     ImageView imageUser;
 
-
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
     FirebaseUser currentUser;
     FirebaseAuth firebaseAuth;
 
@@ -41,12 +59,18 @@ public class ProfileActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        userProfileLayout = findViewById(R.id.userProfileLayout);
+        userProfileProgress = findViewById(R.id.userProfileProgress);
+
         textName = findViewById(R.id.textNameProfile);
+        textLastName = findViewById(R.id.textLastNameProfile);
         textEmail = findViewById(R.id.textEmailProfile);
         imageUser = findViewById(R.id.userImageProfile);
 
         btnLogout = findViewById(R.id.btnLogoutProfile);
 
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("user");
         firebaseAuth = FirebaseConfiguration.getFirebaseAuth();
         currentUser = firebaseAuth.getCurrentUser();
 
@@ -104,9 +128,42 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        textName.setText(currentUser.getDisplayName());
-        textEmail.setText(currentUser.getEmail());
-        Picasso.get().load(currentUser.getPhotoUrl()).into(imageUser);
+
+        databaseReference.orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userProfileLayout.setVisibility(View.VISIBLE);
+                userProfileProgress.setVisibility(View.GONE);
+
+                Iterator usersIterator = dataSnapshot.getChildren().iterator();
+                while (usersIterator.hasNext()) {
+                    DataSnapshot data = (DataSnapshot) usersIterator.next();
+                    if (data.child("email").getValue().toString().equals(currentUser.getEmail())) {
+                        User user = new User(data.child("id").getValue().toString(),
+                                data.child("email").getValue().toString(),
+                                data.child("firstName").getValue().toString(),
+                                data.child("lastName").getValue().toString(),
+                                data.child("profileImage").getValue().toString()
+                        );
+                        textName.setText(user.getFirstName());
+                        textLastName.setText(user.getLastName());
+                        textEmail.setText(user.getEmail());
+
+                        byte[] decodedString = Base64.decode(user.getProfileImage(), Base64.DEFAULT);
+                        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        imageUser.setImageBitmap(decodedByte);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
 
     }
 
