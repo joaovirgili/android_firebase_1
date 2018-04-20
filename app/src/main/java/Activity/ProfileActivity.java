@@ -3,10 +3,7 @@ package Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,14 +19,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import DAO.FirebaseConfiguration;
 
-public class MainActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
 
     TextView textName;
     TextView textEmail;
@@ -45,15 +37,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_profile);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        textName = findViewById(R.id.textName);
-        textEmail = findViewById(R.id.textEmail);
-        imageUser = findViewById(R.id.imageUser);
+        textName = findViewById(R.id.textNameProfile);
+        textEmail = findViewById(R.id.textEmailProfile);
+        imageUser = findViewById(R.id.userImageProfile);
 
-        btnLogout = findViewById(R.id.btnLogout);
+        btnLogout = findViewById(R.id.btnLogoutProfile);
 
         firebaseAuth = FirebaseConfiguration.getFirebaseAuth();
         currentUser = firebaseAuth.getCurrentUser();
@@ -74,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        logoutAlert = new AlertDialog.Builder(MainActivity.this);
+        logoutAlert = new AlertDialog.Builder(ProfileActivity.this);
         logoutAlert.setTitle("Sair");
         logoutAlert.setMessage("Deseja sair?");
         logoutAlert.setPositiveButton("Sim", new DialogInterface.OnClickListener() {
@@ -116,29 +108,6 @@ public class MainActivity extends AppCompatActivity {
         textEmail.setText(currentUser.getEmail());
         Picasso.get().load(currentUser.getPhotoUrl()).into(imageUser);
 
-//        try {
-//            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), currentUser.getPhotoUrl());
-//            imageUser.setImageBitmap(bitmap);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
-
-    public static Bitmap getBitmapFromURL(String src) {
-        try {
-            URL url = new URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            Bitmap myBitmap = BitmapFactory.decodeStream(input);
-            return myBitmap;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
 
 }
