@@ -114,7 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     finish();
                     toast("Cadastro realizado, efetue login.");
-                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    startActivity(new Intent(RegisterActivity.this, AddInformationActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 } else {
                     if (task.getException() instanceof FirebaseAuthUserCollisionException)
                         toast("E-mail já cadastrado.");

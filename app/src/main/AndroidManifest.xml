@@ -26,7 +26,12 @@
         <activity
             android:name="Activity.RegisterActivity"
             android:label="@string/title_activity_form"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name="Activity.AddInformationActivity"
+            android:label="AddInformation"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

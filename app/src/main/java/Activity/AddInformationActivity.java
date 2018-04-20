@@ -8,6 +8,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,29 +18,29 @@ import android.widget.Toast;
 
 import com.example.joaovirgili.projetofirebase1.R;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import classes.User;
 import DAO.FirebaseConfiguration;
 
 public class AddInformationActivity extends AppCompatActivity {
 
     private static final int CHOOSE_IMAGE = 101;
-    StorageReference storageReference;
+    DatabaseReference databaseReference;
+    FirebaseDatabase firebaseDatabase;
     FirebaseAuth firebaseAuth;
     FirebaseUser user;
 
     ImageView imageUpload;
-    Uri uriProfileImage;
+    Bitmap profileImage;
     ProgressBar progressImageUpload;
     String profileImageUrl;
 
@@ -55,11 +56,12 @@ public class AddInformationActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        storageReference = FirebaseStorage.getInstance().getReference();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("user");
         firebaseAuth = FirebaseConfiguration.getFirebaseAuth();
 
         imageUpload = findViewById(R.id.imageUpload);
-        uriProfileImage = null;
+        profileImage = null;
         profileImageUrl = "";
         progressImageUpload = findViewById(R.id.progressImageUpload);
 
@@ -98,15 +100,16 @@ public class AddInformationActivity extends AppCompatActivity {
             progressImageUpload.setVisibility(View.VISIBLE);
             user = firebaseAuth.getCurrentUser();
             if (user != null) {
-                UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder().setDisplayName(displayFirstName).setPhotoUri(uriProfileImage).build();
+                UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder().setDisplayName(displayFirstName).build();
 
                 user.updateProfile(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            insertIntoDatabase(displayFirstName, displayLastName, uriProfileImage);
+                            insertIntoDatabase(displayFirstName, displayLastName, profileImage);
                             progressImageUpload.setVisibility(View.GONE);
                             Toast.makeText(getApplicationContext(), "Informações salvas.", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(AddInformationActivity.this, LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         }
                     }
                 });
@@ -114,8 +117,19 @@ public class AddInformationActivity extends AppCompatActivity {
         }
     }
 
-    private void insertIntoDatabase(String firstName, String lastName, Uri uriProfileImage) {
+    private void insertIntoDatabase(String firstName, String lastName, Bitmap uriProfileImage) {
+        //Convert bitmap to insert into database (base64)
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        uriProfileImage.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream .toByteArray();
+        String profileImageBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
+        //Create user id in database
+        String id = databaseReference.push().getKey();
+
+        //Insert user into database
+        User user = new User(id, firebaseAuth.getCurrentUser().getEmail(), firstName, lastName, profileImageBase64);
+        databaseReference.child(id).setValue(user);
     }
 
     @Override
@@ -123,34 +137,17 @@ public class AddInformationActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == CHOOSE_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            uriProfileImage = data.getData();
+            Uri uriImage = data.getData();
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uriProfileImage);
-                imageUpload.setImageBitmap(bitmap);
+                profileImage = MediaStore.Images.Media.getBitmap(getContentResolver(), uriImage);
+                imageUpload.setImageBitmap(profileImage);
 
-                uploadImageToFirebase();
+//                uploadImageToFirebase();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-    }
-
-    private void uploadImageToFirebase() {
-        final StorageReference profileImageRef = storageReference.child("profilepcis/" + System.currentTimeMillis() +".jpg");
-        if (uriProfileImage != null) {
-            profileImageRef.putFile(uriProfileImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    profileImageUrl = taskSnapshot.getDownloadUrl().toString();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-
-                }
-            });
-        }
     }
 
     private void showImageChooser() {
