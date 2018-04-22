@@ -27,12 +27,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.util.Iterator;
-
-import DAO.FirebaseConfiguration;
-import classes.User;
+import Classes.User;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -71,17 +68,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("user");
-        firebaseAuth = FirebaseConfiguration.getFirebaseAuth();
+        firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +94,9 @@ public class ProfileActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("login")) {
+            Snackbar.make(findViewById(R.id.userProfileLayout), "Login efetuado com sucesso", Snackbar.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -117,12 +108,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void logoutUser() {
         firebaseAuth.signOut();
         finish();
-        toast("Logout efetuado com sucesso.");
         startActivity(new Intent(getApplicationContext(), LoginActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-    }
-
-    private void toast(String text) {
-        Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -138,7 +124,8 @@ public class ProfileActivity extends AppCompatActivity {
                 Iterator usersIterator = dataSnapshot.getChildren().iterator();
                 while (usersIterator.hasNext()) {
                     DataSnapshot data = (DataSnapshot) usersIterator.next();
-                    if (data.child("email").getValue().toString().equals(currentUser.getEmail())) {
+
+                    if (data != null && data.child("email").getValue().toString().equals(currentUser.getEmail())) {
                         User user = new User(data.child("id").getValue().toString(),
                                 data.child("email").getValue().toString(),
                                 data.child("firstName").getValue().toString(),

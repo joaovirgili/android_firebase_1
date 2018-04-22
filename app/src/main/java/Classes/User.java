@@ -1,4 +1,4 @@
-package classes;
+package Classes;
 
 public class User {
     private String id;
@@ -6,6 +6,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String profileImage;
+    private Boolean admin;
 
     public User(String id, String email, String firstName, String lastName, String profileImage) {
         this.id = id;
@@ -13,6 +14,7 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.profileImage = profileImage;
+        this.admin = false;
     }
 
     public String getId() {
@@ -50,4 +52,13 @@ public class User {
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
+
+    public Boolean getAdmin () {
+        return this.admin;
+    }
+
+    public void setAdmin(Boolean admin) {
+        this.admin = admin;
+    }
+
 }

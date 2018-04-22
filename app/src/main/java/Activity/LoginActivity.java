@@ -3,13 +3,9 @@ package Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -23,15 +19,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import DAO.FirebaseConfiguration;
-
 public class LoginActivity extends AppCompatActivity  {
 
     private FirebaseAuth firebaseAuth;
 
     private EditText edtEmail;
     private EditText edtPassword;
-    private TextView tvSignUp;
     private ProgressBar progressLogin;
     private Button btnLogin;
 
@@ -39,23 +32,15 @@ public class LoginActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        firebaseAuth = FirebaseConfiguration.getFirebaseAuth();
+        firebaseAuth = FirebaseAuth.getInstance();
         edtEmail = findViewById(R.id.inputEmail);
         edtPassword = findViewById(R.id.inputPassword);
         btnLogin = findViewById(R.id.buttonLogin);
         progressLogin = findViewById(R.id.progressLogin);
-        tvSignUp = findViewById(R.id.textRegister);
+        TextView tvSignUp = findViewById(R.id.textRegister);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,11 +55,10 @@ public class LoginActivity extends AppCompatActivity  {
         tvSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+
             }
         });
-
-
     }
 
     @Override
@@ -83,29 +67,6 @@ public class LoginActivity extends AppCompatActivity  {
         verifyUser();
     }
 
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     private boolean checkInputs() {
         if (edtEmail.getText().toString().isEmpty()) {
@@ -150,8 +111,7 @@ public class LoginActivity extends AppCompatActivity  {
     }
 
     private void loginSucceeded() {
-        Toast.makeText(LoginActivity.this, "Login efetuado com sucesso.", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
+        startActivity(new Intent(LoginActivity.this, ProfileActivity.class).putExtra("login", true));
     }
 
 }

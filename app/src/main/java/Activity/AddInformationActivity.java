@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -28,8 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import classes.User;
-import DAO.FirebaseConfiguration;
+import Classes.User;
 
 public class AddInformationActivity extends AppCompatActivity {
 
@@ -58,7 +58,7 @@ public class AddInformationActivity extends AppCompatActivity {
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference("user");
-        firebaseAuth = FirebaseConfiguration.getFirebaseAuth();
+        firebaseAuth = FirebaseAuth.getInstance();
 
         imageUpload = findViewById(R.id.imageUpload);
         profileImage = null;
@@ -84,6 +84,14 @@ public class AddInformationActivity extends AppCompatActivity {
             }
         });
 
+        checkExtras();
+    }
+
+    private void checkExtras() {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null && extras.containsKey("firstLogin") && extras.getBoolean("firstLogin")) {
+            Snackbar.make(findViewById(R.id.infoLayout), "Conta criada, adicione mais informações ao cadsatro.", Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     private void saveUserInformation() {
@@ -128,8 +136,10 @@ public class AddInformationActivity extends AppCompatActivity {
         String id = databaseReference.push().getKey();
 
         //Insert user into database
-        User user = new User(id, firebaseAuth.getCurrentUser().getEmail(), firstName, lastName, profileImageBase64);
-        databaseReference.child(id).setValue(user);
+        if (firebaseAuth.getCurrentUser() != null) {
+            User user = new User(id, firebaseAuth.getCurrentUser().getEmail(), firstName, lastName, profileImageBase64);
+            databaseReference.child(id).setValue(user);
+        }
     }
 
     @Override

@@ -9,6 +9,7 @@
     tools:showIn="@layout/activity_add_info">
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/infoLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"

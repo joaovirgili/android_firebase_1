@@ -17,12 +17,12 @@ import com.example.joaovirgili.projetofirebase1.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
-import DAO.FirebaseConfiguration;
-
-
 public class RegisterActivity extends AppCompatActivity {
+
+    FirebaseAuth firebaseAuth;
 
     TextView tvEmail;
     TextView tvPassword;
@@ -32,8 +32,6 @@ public class RegisterActivity extends AppCompatActivity {
     ProgressBar progressRegister;
     Button btnRegister;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,20 +39,14 @@ public class RegisterActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        firebaseAuth = FirebaseAuth.getInstance();
 
         tvEmail = findViewById(R.id.inputEmailForm);
         tvEmail.requestFocus();
         tvPassword = findViewById(R.id.inputPasswordForm);
         tvConfirmPassword = findViewById(R.id.inputConfirmPasswordForm);
         tvLogin = findViewById(R.id.textLogin);
+
         progressRegister = findViewById(R.id.progressRegister);
         btnRegister = findViewById(R.id.btnFormRegister);
 
@@ -76,8 +68,6 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
     private boolean checkInputs() {
@@ -106,15 +96,14 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void registerUser(String email, String password) {
-        FirebaseConfiguration.getFirebaseAuth().createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 btnRegister.setClickable(true);
                 progressRegister.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
                     finish();
-                    toast("Cadastro realizado, efetue login.");
-                    startActivity(new Intent(RegisterActivity.this, AddInformationActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    startActivity(new Intent(RegisterActivity.this, AddInformationActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("firstLogin", true));
                 } else {
                     if (task.getException() instanceof FirebaseAuthUserCollisionException)
                         toast("E-mail já cadastrado.");
