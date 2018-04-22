@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="Activity.ProfileActivity"
+    tools:context="com.example.joaovirgili.projetofirebase1.Activity.ProfileActivity"
     tools:showIn="@layout/activity_profile">
 
     <TextView
@@ -34,6 +34,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/btnShowUsers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ver usuários"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/btnLogoutProfile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/btnLogoutProfile"
+        app:layout_constraintTop_toTopOf="@+id/btnLogoutProfile" />
+
     <ProgressBar
         android:id="@+id/userProfileProgress"
         style="?android:attr/progressBarStyle"
@@ -47,7 +58,7 @@
         android:layout_marginTop="8dp"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/btnLogoutProfile"
-        app:layout_constraintEnd_toEndOf="@+id/userProfileLayout"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/userProfileLayout"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 

@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="Activity.LoginActivity"
+            android:name=".Activity.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -20,18 +20,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="Activity.ProfileActivity"
+            android:name=".Activity.ProfileActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="Activity.RegisterActivity"
+            android:name=".Activity.RegisterActivity"
             android:label="@string/title_activity_form"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity android:name="Activity.AddInformationActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.AddInformationActivity"
             android:label="AddInformation"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.UsersList"
+            android:label="@string/title_activity_users_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

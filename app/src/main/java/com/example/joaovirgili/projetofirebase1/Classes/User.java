@@ -1,4 +1,4 @@
-package Classes;
+package com.example.joaovirgili.projetofirebase1.Classes;
 
 public class User {
     private String id;

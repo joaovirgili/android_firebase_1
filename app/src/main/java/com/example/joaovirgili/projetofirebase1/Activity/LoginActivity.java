@@ -1,4 +1,4 @@
-package Activity;
+package com.example.joaovirgili.projetofirebase1.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;

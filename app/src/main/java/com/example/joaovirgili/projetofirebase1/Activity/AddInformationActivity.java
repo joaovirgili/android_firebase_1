@@ -1,4 +1,4 @@
-package Activity;
+package com.example.joaovirgili.projetofirebase1.Activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,7 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import Classes.User;
+import com.example.joaovirgili.projetofirebase1.Classes.User;
 
 public class AddInformationActivity extends AppCompatActivity {
 
