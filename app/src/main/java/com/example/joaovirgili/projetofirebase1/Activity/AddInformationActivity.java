@@ -1,5 +1,6 @@
 package com.example.joaovirgili.projetofirebase1.Activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -33,7 +35,8 @@ import com.example.joaovirgili.projetofirebase1.Classes.User;
 
 public class AddInformationActivity extends AppCompatActivity {
 
-    private static final int CHOOSE_IMAGE = 101;
+    private static final int CHOOSE_IMAGE = 0;
+    private static final int REQUEST_CAMERA = 1;
     DatabaseReference databaseReference;
     FirebaseDatabase firebaseDatabase;
     FirebaseAuth firebaseAuth;
@@ -145,7 +148,6 @@ public class AddInformationActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == CHOOSE_IMAGE && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri uriImage = data.getData();
             try {
@@ -158,7 +160,25 @@ public class AddInformationActivity extends AppCompatActivity {
     }
 
     private void showImageChooser() {
-        Intent intent = new Intent().setType("image/*").setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, CHOOSE_IMAGE);
+        //
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(AddInformationActivity.this);
+        builder.setTitle("Adicionar foto");
+        builder.setItems(new CharSequence[]{"Camera", "Galeria", "Cancelar"}, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(intent, REQUEST_CAMERA);
+                } else if (which == 1) {
+                    Intent intent = new Intent().setType("image/*").setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(intent, CHOOSE_IMAGE);
+                } else {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+
     }
 }
